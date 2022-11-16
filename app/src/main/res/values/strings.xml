@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Tic-Tac-Toe</string>
+
+    <!-- GameScreen -->
+    <string name="your_turn">Your turn</string>
+    <string name="my_turn">My turn</string>
 </resources>
