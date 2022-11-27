@@ -4,4 +4,6 @@
     <!-- GameScreen -->
     <string name="your_turn">Your turn</string>
     <string name="my_turn">My turn</string>
+    <string name="game_complete">Game complete! Winner: %1$s</string>
+    <string name="restart">Restart</string>
 </resources>

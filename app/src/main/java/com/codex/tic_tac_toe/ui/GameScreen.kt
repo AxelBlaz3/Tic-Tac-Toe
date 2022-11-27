@@ -1,9 +1,7 @@
 package com.codex.tic_tac_toe.ui
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,47 +12,56 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.codex.tic_tac_toe.R
 import com.codex.tic_tac_toe.ui.component.BoardButton
+import com.codex.tic_tac_toe.ui.event.GameEvent
 import com.codex.tic_tac_toe.ui.theme.TicTacToeTheme
 
 @Composable
 fun GameScreen(
-    modifier: Modifier = Modifier,
-    gameViewModel: GameViewModel = hiltViewModel()
+    modifier: Modifier = Modifier, gameViewModel: GameViewModel = hiltViewModel()
 ) {
     val gameState = gameViewModel.gameState.value
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        GameBoard(board = gameState.board)
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        GameBoard(board = gameState.board) { i, j ->
+            gameViewModel.onEvent(
+                GameEvent.OnMovePlayed(rowIndex = i, colIndex = j)
+            )
+        }
         Spacer(modifier = modifier.height(8.dp))
-        if (gameState.isPlayerMove) {
-            Text(text = stringResource(id = R.string.your_turn))
+        if (gameState.isGameComplete) {
+            Text(text = stringResource(id = R.string.game_complete, gameState.winner))
         } else {
-            Text(text = stringResource(id = R.string.my_turn))
+            if (gameState.isPlayerMove) {
+                Text(text = stringResource(id = R.string.your_turn))
+            } else {
+                Text(text = stringResource(id = R.string.my_turn))
+            }
+        }
+
+        if (gameState.isGameComplete) {
+            Spacer(modifier = modifier.height(8.dp))
+            OutlinedButton(onClick = { gameViewModel.onEvent(GameEvent.GameRestart) }) {
+                Text(text = stringResource(id = R.string.restart))
+            }
         }
     }
 }
 
 @Composable
 fun GameBoard(
-    modifier: Modifier = Modifier,
-    board: List<Char>
+    modifier: Modifier = Modifier, board: List<List<Char>>, onClick: (Int, Int) -> Unit
 ) {
     Column {
-        BoardRow(board = board.slice(indices = 0..2))
-        BoardRow(board = board.slice(indices = 3..5))
-        BoardRow(board = board.slice(indices = 6..8))
-    }
-}
-
-@Composable
-fun BoardRow(
-    modifier: Modifier = Modifier,
-    board: List<Char>
-) {
-    Row {
-        board.slice(indices = 0..2).forEach { it ->
-            BoardButton(playerText = it) {
-
+        board.forEachIndexed { i, boardRow ->
+            Row {
+                boardRow.forEachIndexed { j, playerText ->
+                    BoardButton(playerText = playerText) {
+                        onClick(i, j)
+                    }
+                }
             }
         }
     }
